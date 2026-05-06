@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TugasKu — Bantuan Tugas & Project Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { poppins: ['Poppins', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#EEF2FF', 100: '#E0E7FF', 200: '#C7D2FE',
+              300: '#A5B4FC', 400: '#818CF8', 500: '#6366F1',
+              600: '#4F46E5', 700: '#4338CA', 800: '#3730A3', 900: '#312E81'
+            },
+            accent: { 400: '#A78BFA', 500: '#7C3AED', 600: '#6D28D9' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { font-family: 'Poppins', sans-serif; }
+
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .65s cubic-bezier(.22,.61,.36,1), transform .65s cubic-bezier(.22,.61,.36,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: .08s; }
+    .reveal-d2 { transition-delay: .16s; }
+    .reveal-d3 { transition-delay: .24s; }
+    .reveal-d4 { transition-delay: .32s; }
+
+    @keyframes heroFadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-anim { animation: heroFadeUp .8s cubic-bezier(.22,.61,.36,1) forwards; opacity: 0; }
+    .hero-anim-d1 { animation-delay: .1s; }
+    .hero-anim-d2 { animation-delay: .25s; }
+    .hero-anim-d3 { animation-delay: .4s; }
+    .hero-anim-d4 { animation-delay: .55s; }
+
+    @keyframes orbFloat {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%     { transform: translate(30px,-20px) scale(1.05); }
+      66%     { transform: translate(-20px,15px) scale(.97); }
+    }
+    .orb { animation: orbFloat 10s ease-in-out infinite; }
+    .orb-2 { animation-delay: -4s; animation-duration: 13s; }
+
+    @keyframes waPulse {
+      0%   { transform: scale(1); opacity: .5; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    .wa-ring::after {
+      content: ''; position: absolute; inset: 0; border-radius: 50%;
+      background: #22C55E; animation: waPulse 2s ease-out infinite; z-index: -1;
+    }
+
+    .tab-slider { transition: transform .35s cubic-bezier(.22,.61,.36,1); }
+
+    .form-panel { transition: opacity .35s ease, transform .35s ease; }
+    .form-panel.hidden-panel {
+      opacity: 0; transform: translateY(12px); pointer-events: none; position: absolute; inset: 0;
+    }
+    .form-panel.active-panel {
+      opacity: 1; transform: translateY(0); pointer-events: auto; position: relative;
+    }
+
+    .toast-box { transform: translateX(130%); transition: transform .45s cubic-bezier(.34,1.56,.64,1); }
+    .toast-box.show { transform: translateX(0); }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #C7D2FE; border-radius: 10px; }
+
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(99,102,241,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-gray-800 antialiased overflow-x-hidden grid-bg">
+
+  <!-- Toast -->
+  <div id="toast" class="toast-box fixed top-5 right-5 z-[200] bg-white border border-brand-100 rounded-2xl shadow-2xl p-4 flex items-center gap-3 max-w-xs">
+    <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+      <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600"></i>
+    </div>
+    <div>
+      <p class="font-semibold text-sm text-gray-900">Berhasil Dikirim!</p>
+      <p class="text-[11px] text-gray-400">Pesanan dikirim via WhatsApp</p>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav id="nav" class="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center shadow-lg shadow-brand-200/50">
+          <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+        </div>
+        <span class="font-bold text-[17px] text-gray-900 tracking-tight">TugasKu</span>
+      </a>
+      <div class="hidden md:flex items-center gap-7">
+        <a href="#layanan" class="text-[13px] text-gray-400 hover:text-brand-600 transition-colors">Layanan</a>
+        <a href="#keunggulan" class="text-[13px] text-gray-400 hover:text-brand-600 transition-colors">Keunggulan</a>
+        <a href="#cara-order" class="text-[13px] text-gray-400 hover:text-brand-600 transition-colors">Cara Order</a>
+        <a href="#form-section" class="text-[13px] font-semibold text-white bg-brand-600 hover:bg-brand-700 px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-brand-200/60">Order Sekarang</a>
+      </div>
+      <button id="mobBtn" class="md:hidden w-10 h-10 rounded-xl hover:bg-gray-50 flex items-center justify-center transition-colors">
+        <i data-lucide="menu" class="w-5 h-5 text-gray-600"></i>
+      </button>
+    </div>
+    <div id="mobMenu" class="md:hidden hidden bg-white/95 backdrop-blur-2xl border-t border-gray-100/80">
+      <div class="px-5 py-4 flex flex-col gap-1">
+        <a href="#layanan" class="mob-link text-sm text-gray-500 py-2.5 rounded-xl px-3 hover:bg-brand-50 hover:text-brand-600 transition-colors">Layanan</a>
+        <a href="#keunggulan" class="mob-link text-sm text-gray-500 py-2.5 rounded-xl px-3 hover:bg-brand-50 hover:text-brand-600 transition-colors">Keunggulan</a>
+        <a href="#cara-order" class="mob-link text-sm text-gray-500 py-2.5 rounded-xl px-3 hover:bg-brand-50 hover:text-brand-600 transition-colors">Cara Order</a>
+        <a href="#form-section" class="mob-link text-sm font-semibold text-white bg-brand-600 py-3 rounded-xl text-center mt-2">Order Sekarang</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+    <div class="orb absolute -top-20 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-brand-200/50 via-accent-400/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+    <div class="orb-2 absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-accent-300/20 via-brand-200/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent z-10 pointer-events-none"></div>
+
+    <div class="relative z-20 max-w-3xl mx-auto px-5 text-center">
+      <div class="hero-anim hero-anim-d1 inline-flex items-center gap-2 bg-brand-50/80 border border-brand-100/80 rounded-full px-4 py-1.5 mb-8 backdrop-blur-sm">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-[11px] font-medium text-brand-700 tracking-wide">Online & Siap Membantu</span>
+      </div>
+
+      <h1 class="hero-anim hero-anim-d2 text-[2.1rem] sm:text-5xl md:text-[3.4rem] font-extrabold text-gray-900 leading-[1.08] tracking-tight">
+        Butuh bantuan tugas<br>atau project?
+        <span class="bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 bg-clip-text text-transparent"> Kami siap bantu</span><br>
+        dengan cepat & aman.
+      </h1>
+
+      <p class="hero-anim hero-anim-d3 mt-5 text-sm sm:text-[15px] text-gray-400 max-w-xl mx-auto leading-relaxed">
+        Layanan profesional untuk tugas akademik hingga project digital. Dikerjakan tim berpengalaman dengan jaminan kualitas & tepat waktu.
+      </p>
+
+      <div class="hero-anim hero-anim-d4 mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+        <a id="heroConsult" href="#" class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 border-2 border-brand-200 text-brand-600 hover:bg-brand-50 font-semibold px-7 py-3.5 rounded-2xl transition-all duration-200 text-sm">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          Konsultasi Gratis
+        </a>
+        <a id="heroOrder" href="#form-section" class="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-7 py-3.5 rounded-2xl transition-all duration-200 hover:shadow-xl hover:shadow-brand-200/60 hover:-translate-y-0.5 text-sm">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Order Sekarang
+        </a>
+      </div>
+
+      <div class="hero-anim hero-anim-d4 mt-14 flex flex-wrap items-center justify-center gap-x-7 gap-y-2.5 text-[11px] text-gray-400">
+        <span class="flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i>Privasi Terjamin</span>
+        <span class="flex items-center gap-1.5"><i data-lucide="clock-3" class="w-3.5 h-3.5"></i>Tepat Waktu</span>
+        <span class="flex items-center gap-1.5"><i data-lucide="repeat-2" class="w-3.5 h-3.5"></i>Garansi Revisi</span>
+        <span class="flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5"></i>500+ Klien Puas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Layanan -->
+  <section id="layanan" class="py-24 sm:py-32">
+    <div class="max-w-6xl mx-auto px-5">
+      <div class="text-center mb-14">
+        <p class="reveal text-[11px] font-bold uppercase tracking-[.18em] text-brand-500 mb-2.5">Layanan Kami</p>
+        <h2 class="reveal reveal-d1 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Solusi lengkap untuk kebutuhan tugasmu</h2>
+        <p class="reveal reveal-d2 mt-3.5 text-sm text-gray-400 max-w-md mx-auto">Pilih kategori yang sesuai, kami akan selesaikan dengan hasil terbaik.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-5">
+        <div class="reveal reveal-d1 group bg-white border border-gray-100 rounded-3xl p-7 sm:p-8 hover:border-brand-200/80 hover:shadow-2xl hover:shadow-brand-100/40 transition-all duration-500 hover:-translate-y-1.5">
+          <div class="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100/60 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <i data-lucide="book-open-text" class="w-6 h-6 text-brand-600"></i>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 mb-1.5">Tugas Akademik</h3>
+          <p class="text-[13px] text-gray-400 leading-relaxed mb-7">Makalah, laporan, proposal, tugas harian, dan berbagai tugas kuliah lainnya.</p>
+          <div class="flex items-end justify-between">
+            <div>
+              <p class="text-[10px] text-gray-300 uppercase tracking-wider font-medium">Mulai dari</p>
+              <p class="text-2xl font-extrabold text-brand-600 mt-0.5">Rp50K</p>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-gray-50 group-hover:bg-brand-600 flex items-center justify-center transition-all duration-300">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-300 group-hover:text-white transition-colors"></i>
+            </div>
+          </div>
+        </div>
+        <div class="reveal reveal-d2 group relative bg-white border border-gray-100 rounded-3xl p-7 sm:p-8 hover:border-accent-400/40 hover:shadow-2xl hover:shadow-accent-100/30 transition-all duration-500 hover:-translate-y-1.5">
+          <span class="absolute top-5 right-5 text-[9px] font-bold uppercase tracking-widest bg-gradient-to-r from-accent-500 to-brand-500 text-white px-3 py-1 rounded-full">Popular</span>
+          <div class="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-accent-500/10 to-accent-400/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <i data-lucide="graduation-cap" class="w-6 h-6 text-accent-500"></i>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 mb-1.5">Tugas Lanjutan</h3>
+          <p class="text-[13px] text-gray-400 leading-relaxed mb-7">Skripsi, seminar proposal, revisi, bab 1–5, dan tugas akhir lainnya.</p>
+          <div class="flex items-end justify-between">
+            <div>
+              <p class="text-[10px] text-gray-300 uppercase tracking-wider font-medium">Mulai dari</p>
+              <p class="text-2xl font-extrabold text-accent-500 mt-0.5">Rp200K</p>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-gray-50 group-hover:bg-accent-500 flex items-center justify-center transition-all duration-300">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-300 group-hover:text-white transition-colors"></i>
+            </div>
+          </div>
+        </div>
+        <div class="reveal reveal-d3 group bg-white border border-gray-100 rounded-3xl p-7 sm:p-8 hover:border-emerald-200/80 hover:shadow-2xl hover:shadow-emerald-100/30 transition-all duration-500 hover:-translate-y-1.5">
+          <div class="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/40 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <i data-lucide="code-2" class="w-6 h-6 text-emerald-600"></i>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 mb-1.5">Digital Project</h3>
+          <p class="text-[13px] text-gray-400 leading-relaxed mb-7">Landing page, website, blog, coding project, dan solusi digital lainnya.</p>
+          <div class="flex items-end justify-between">
+            <div>
+              <p class="text-[10px] text-gray-300 uppercase tracking-wider font-medium">Mulai dari</p>
+              <p class="text-2xl font-extrabold text-emerald-600 mt-0.5">Rp350K</p>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-gray-50 group-hover:bg-emerald-600 flex items-center justify-center transition-all duration-300">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-300 group-hover:text-white transition-colors"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Keunggulan -->
+  <section id="keunggulan" class="py-24 sm:py-32 bg-gradient-to-b from-gray-50/80 to-white">
+    <div class="max-w-5xl mx-auto px-5">
+      <div class="text-center mb-14">
+        <p class="reveal text-[11px] font-bold uppercase tracking-[.18em] text-brand-500 mb-2.5">Kenapa Kami</p>
+        <h2 class="reveal reveal-d1 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Keunggulan yang bikin klien percaya</h2>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div class="reveal reveal-d1 bg-white rounded-2xl p-6 text-center border border-gray-100 hover:shadow-xl hover:shadow-brand-50 transition-all duration-400 hover:-translate-y-1 group">
+          <div class="w-11 h-11 rounded-xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center mx-auto mb-4 transition-colors">
+            <i data-lucide="timer" class="w-5 h-5 text-blue-500"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Tepat Waktu</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Pengerjaan sesuai deadline yang disepakati.</p>
+        </div>
+        <div class="reveal reveal-d2 bg-white rounded-2xl p-6 text-center border border-gray-100 hover:shadow-xl hover:shadow-green-50 transition-all duration-400 hover:-translate-y-1 group">
+          <div class="w-11 h-11 rounded-xl bg-green-50 group-hover:bg-green-100 flex items-center justify-center mx-auto mb-4 transition-colors">
+            <i data-lucide="shield-check" class="w-5 h-5 text-green-500"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Privasi Aman</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Data & tugas dijamin kerahasiaannya 100%.</p>
+        </div>
+        <div class="reveal reveal-d3 bg-white rounded-2xl p-6 text-center border border-gray-100 hover:shadow-xl hover:shadow-amber-50 transition-all duration-400 hover:-translate-y-1 group">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center mx-auto mb-4 transition-colors">
+            <i data-lucide="refresh-cw" class="w-5 h-5 text-amber-500"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Bisa Revisi</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Revisi gratis sampai hasil sesuai keinginan.</p>
+        </div>
+        <div class="reveal reveal-d4 bg-white rounded-2xl p-6 text-center border border-gray-100 hover:shadow-xl hover:shadow-purple-50 transition-all duration-400 hover:-translate-y-1 group">
+          <div class="w-11 h-11 rounded-xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center mx-auto mb-4 transition-colors">
+            <i data-lucide="zap" class="w-5 h-5 text-purple-500"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Fast Response</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Respon cepat via WhatsApp, kapan pun.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cara Order -->
+  <section id="cara-order" class="py-24 sm:py-32">
+    <div class="max-w-4xl mx-auto px-5">
+      <div class="text-center mb-14">
+        <p class="reveal text-[11px] font-bold uppercase tracking-[.18em] text-brand-500 mb-2.5">Proses Mudah</p>
+        <h2 class="reveal reveal-d1 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">4 langkah simpel untuk mulai</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="reveal reveal-d1 text-center relative">
+          <div class="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-brand-600 to-accent-500 text-white font-extrabold text-lg flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-200/60">1</div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Chat / Isi Form</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Hubungi via WhatsApp atau isi form di bawah.</p>
+          <div class="hidden lg:block absolute top-[26px] left-[calc(50%+30px)] w-[calc(100%-60px)] border-t-2 border-dashed border-brand-100"></div>
+        </div>
+        <div class="reveal reveal-d2 text-center relative">
+          <div class="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-brand-600 to-accent-500 text-white font-extrabold text-lg flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-200/60">2</div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Kirim Detail Tugas</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Jelaskan jenis, requirements, dan file pendukung.</p>
+          <div class="hidden lg:block absolute top-[26px] left-[calc(50%+30px)] w-[calc(100%-60px)] border-t-2 border-dashed border-brand-100"></div>
+        </div>
+        <div class="reveal reveal-d3 text-center relative">
+          <div class="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-brand-600 to-accent-500 text-white font-extrabold text-lg flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-200/60">3</div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Dapat Estimasi Harga</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Admin kasih harga & estimasi waktu pengerjaan.</p>
+          <div class="hidden lg:block absolute top-[26px] left-[calc(50%+30px)] w-[calc(100%-60px)] border-t-2 border-dashed border-brand-100"></div>
+        </div>
+        <div class="reveal reveal-d4 text-center">
+          <div class="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-brand-600 to-accent-500 text-white font-extrabold text-lg flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-200/60">4</div>
+          <h3 class="font-semibold text-gray-900 text-sm mb-1">Proses Pengerjaan</h3>
+          <p class="text-[11px] text-gray-400 leading-relaxed">Tugas dikerjakan & dikirim sebelum deadline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Form Section (2 Tabs) -->
+  <section id="form-section" class="py-24 sm:py-32 bg-gradient-to-b from-gray-50/80 to-white">
+    <div class="max-w-xl mx-auto px-5">
+      <div class="text-center mb-10">
+        <p class="reveal text-[11px] font-bold uppercase tracking-[.18em] text-brand-500 mb-2.5">Hubungi Kami</p>
+        <h2 class="reveal reveal-d1 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Siap memesan atau konsultasi?</h2>
+        <p class="reveal reveal-d2 mt-3 text-sm text-gray-400">Pilih sesuai kebutuhanmu, data langsung dikirim ke WhatsApp admin.</p>
+      </div>
+
+      <div class="reveal reveal-d2 bg-white rounded-3xl border border-gray-100 shadow-2xl shadow-gray-200/40 overflow-hidden">
+        <!-- Tab Header -->
+        <div class="relative flex border-b border-gray-100">
+          <div id="tabSlider" class="tab-slider absolute top-0 left-0 h-full bg-brand-50 rounded-t-2xl border-b-2 border-brand-500" style="width:50%;transform:translateX(0%)"></div>
+          <button id="tabConsult" class="tab-btn relative z-10 flex-1 py-4 text-sm font-semibold text-brand-700 flex items-center justify-center gap-2 transition-colors" data-tab="consult">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+            Konsultasi
+          </button>
+          <button id="tabOrder" class="tab-btn relative z-10 flex-1 py-4 text-sm font-semibold text-gray-400 flex items-center justify-center gap-2 transition-colors" data-tab="order">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            Pemesanan
+          </button>
+        </div>
+
+        <!-- Form Container -->
+        <div class="relative p-6 sm:p-8">
+          <!-- Panel A: Konsultasi -->
+          <form id="formConsult" class="form-panel active-panel space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap</label>
+              <input type="text" id="cNama" required placeholder="Masukkan nama kamu"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition-all placeholder:text-gray-300">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Pertanyaan / Kebutuhan</label>
+              <textarea id="cPertanyaan" rows="4" required
+                placeholder="Contoh: Saya mau tanya tentang estimasi harga untuk pembuatan landing page bisnis UMKM..."
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition-all placeholder:text-gray-300 resize-none leading-relaxed"></textarea>
+            </div>
+            <button type="submit" id="btnConsult"
+              class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3.5 rounded-2xl transition-all duration-200 hover:shadow-xl hover:shadow-brand-200/50 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              <span class="btn-label">Kirim Konsultasi via WhatsApp</span>
+              <svg class="btn-spin hidden w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+            </button>
+            <p class="text-center text-[11px] text-gray-300">Gratis, tanpa komitmen.</p>
+          </form>
+
+          <!-- Panel B: Pemesanan -->
+          <form id="formOrder" class="form-panel hidden-panel space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap</label>
+              <input type="text" id="oNama" required placeholder="Masukkan nama kamu"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition-all placeholder:text-gray-300">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilihan Layanan</label>
+              <select id="oLayanan" required
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition-all text-gray-700 bg-white appearance-none cursor-pointer"
+                style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 fill=%22%239CA3AF%22 viewBox=%220 0 16 16%22><path d=%22M8 11L3 6h10l-5 5z%22/></svg>');background-repeat:no-repeat;background-position:right 1rem center;">
+                <option value="" disabled selected>Pilih layanan...</option>
+                <option value="Tugas Akademik">Tugas Akademik — Mulai Rp50K</option>
+                <option value="Tugas Lanjutan">Tugas Lanjutan — Mulai Rp200K</option>
+                <option value="Digital Project">Digital Project — Mulai Rp350K</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Detail Tugas</label>
+              <textarea id="oDetail" rows="4" required
+                placeholder="Contoh: Buatkan makalah tentang pengaruh AI terhadap pendidikan, minimal 3000 kata, format APA, bahasa Indonesia..."
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition-all placeholder:text-gray-300 resize-none leading-relaxed"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Deadline</label>
+              <input type="date" id="oDeadline" required
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition-all text-gray-700 cursor-pointer">
+            </div>
+            <input type="hidden" id="oRating" value="5">
+            <button type="submit" id="btnOrder"
+              class="w-full bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-700 hover:to-accent-600 text-white font-semibold py-3.5 rounded-2xl transition-all duration-200 hover:shadow-xl hover:shadow-brand-200/50 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              <span class="btn-label">Kirim Pesanan via WhatsApp</span>
+              <svg class="btn-spin hidden w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+            </button>
+            <p class="text-center text-[11px] text-gray-300">Data kamu aman & tidak dibagikan ke pihak manapun.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 bg-white border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-md bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
+          <i data-lucide="zap" class="w-3 h-3 text-white"></i>
+        </div>
+        <span class="font-bold text-sm text-gray-900">TugasKu</span>
+      </div>
+      <p class="text-[11px] text-gray-300">&copy; 2025 TugasKu. Semua hak dilindungi.</p>
+      <div class="flex items-center gap-2">
+        <a href="mailto:tariu488@gmail.com" class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-brand-50 flex items-center justify-center transition-colors" title="Email">
+          <i data-lucide="mail" class="w-3.5 h-3.5 text-gray-400"></i>
+        </a>
+        <a href="https://wa.me/6281229171890" target="_blank" class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-green-50 flex items-center justify-center transition-colors" title="WhatsApp">
+          <svg class="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WA -->
+  <a id="waFloat" href="https://wa.me/6281229171890" target="_blank" rel="noopener"
+    class="wa-ring fixed bottom-6 right-6 z-50 w-[60px] h-[60px] bg-[#22C55E] hover:bg-[#16A34A] rounded-full flex items-center justify-center shadow-lg shadow-green-300/40 hover:shadow-xl hover:shadow-green-300/50 hover:-translate-y-1 transition-all duration-300">
+    <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+
+  <script>
+    // ════════════════════════════════════════
+    // KONFIGURASI — SUDAH DIISI LANGSUNG
+    // ════════════════════════════════════════
+    const CFG = {
+      waNumber: '6281229171890',
+      adminEmail: 'tariu488@gmail.com'
+    };
+
+    lucide.createIcons();
+
+    // ── Navbar scroll ──
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('bg-white/90', scrollY > 30);
+      nav.classList.toggle('backdrop-blur-2xl', scrollY > 30);
+      nav.classList.toggle('shadow-sm', scrollY > 30);
+      nav.classList.toggle('border-b', scrollY > 30);
+      nav.classList.toggle('border-gray-100/60', scrollY > 30);
+    });
+
+    // ── Mobile menu ──
+    const mobBtn = document.getElementById('mobBtn');
+    const mobMenu = document.getElementById('mobMenu');
+    mobBtn.addEventListener('click', () => mobMenu.classList.toggle('hidden'));
+    document.querySelectorAll('.mob-link').forEach(l =>
+      l.addEventListener('click', () => mobMenu.classList.add('hidden'))
+    );
+
+    // ── Scroll reveal ──
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // ── Min date deadline ──
+    document.getElementById('oDeadline').min = new Date().toISOString().split('T')[0];
+
+    // ── Tab toggle ──
+    const tabConsult = document.getElementById('tabConsult');
+    const tabOrder = document.getElementById('tabOrder');
+    const slider = document.getElementById('tabSlider');
+    const formConsult = document.getElementById('formConsult');
+    const formOrder = document.getElementById('formOrder');
+
+    function switchTab(tab) {
+      if (tab === 'consult') {
+        slider.style.transform = 'translateX(0%)';
+        tabConsult.classList.replace('text-gray-400', 'text-brand-700');
+        tabOrder.classList.replace('text-brand-700', 'text-gray-400');
+        formConsult.classList.replace('hidden-panel', 'active-panel');
+        formOrder.classList.replace('active-panel', 'hidden-panel');
+      } else {
+        slider.style.transform = 'translateX(100%)';
+        tabOrder.classList.replace('text-gray-400', 'text-brand-700');
+        tabConsult.classList.replace('text-brand-700', 'text-gray-400');
+        formOrder.classList.replace('hidden-panel', 'active-panel');
+        formConsult.classList.replace('active-panel', 'hidden-panel');
+      }
+    }
+    tabConsult.addEventListener('click', () => switchTab('consult'));
+    tabOrder.addEventListener('click', () => switchTab('order'));
+
+    // ── WhatsApp helper ──
+    function waLink(msg) {
+      return `https://wa.me/${CFG.waNumber}?text=${encodeURIComponent(msg)}`;
+    }
+
+    // Set default WA links
+    const defaultMsg = 'Halo admin, saya ingin konsultasi tentang layanan tugas/project.';
+    document.getElementById('heroConsult').href = waLink(defaultMsg);
+
+    // ── Toast ──
+    function showToast() {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 4000);
+    }
+
+    // ── Loading state ──
+    function setLoading(btn, loading) {
+      const label = btn.querySelector('.btn-label');
+      const spin = btn.querySelector('.btn-spin');
+      btn.disabled = loading;
+      if (loading) {
+        label.textContent = 'Mengirim...';
+        spin.classList.remove('hidden');
+      } else {
+        label.textContent = label.dataset.orig;
+        spin.classList.add('hidden');
+      }
+    }
+    document.querySelectorAll('.btn-label').forEach(l => l.dataset.orig = l.textContent);
+
+    // ── Kirim ke email via FormSubmit.co ──
+    async function sendEmail(data) {
+      try {
+        await fetch(`https://formsubmit.co/ajax/${CFG.adminEmail}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            _subject: `[TugasKu] ${data.type} dari ${data.nama}`,
+            Nama: data.nama,
+            Jenis: data.type,
+            Layanan: data.layanan || '-',
+            Detail: data.detail,
+            Deadline: data.deadline || '-',
+            Rating: data.rating || '-'
+          })
+        });
+      } catch (err) {
+        console.log('Email gagal terkirim:', err);
+      }
+    }
+
+    // ── FORM: Konsultasi ──
+    document.getElementById('formConsult').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const nama = document.getElementById('cNama').value.trim();
+      const pertanyaan = document.getElementById('cPertanyaan').value.trim();
+      if (!nama || !pertanyaan) return;
+
+      const msg = `Halo admin, saya ingin konsultasi:\n\nNama: ${nama}\nPertanyaan: ${pertanyaan}`;
+      const btn = document.getElementById('btnConsult');
+
+      setLoading(btn, true);
+
+      // Kirim email di background
+      sendEmail({ type: 'Konsultasi', nama, detail: pertanyaan });
+
+      // Buka WhatsApp setelah delay singkat
+      setTimeout(() => {
+        window.open(waLink(msg), '_blank');
+        showToast();
+        this.reset();
+        setLoading(btn, false);
+      }, 600);
+    });
+
+    // ── FORM: Pemesanan ──
+    document.getElementById('formOrder').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const nama = document.getElementById('oNama').value.trim();
+      const layanan = document.getElementById('oLayanan').value;
+      const detail = document.getElementById('oDetail').value.trim();
+      const deadline = document.getElementById('oDeadline').value;
+      const rating = document.getElementById('oRating').value;
+      if (!nama || !layanan || !detail || !deadline) return;
+
+      const deadlineFmt = new Date(deadline).toLocaleDateString('id-ID', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+
+      const msg = `Halo admin, saya mau order:\n\nNama: ${nama}\nLayanan: ${layanan}\nDetail: ${detail}\nDeadline: ${deadlineFmt}`;
+      const btn = document.getElementById('btnOrder');
+
+      setLoading(btn, true);
+
+      // Kirim email di background
+      sendEmail({ type: 'Pemesanan', nama, layanan, detail, deadline: deadlineFmt, rating });
+
+      // Buka WhatsApp setelah delay singkat
+      setTimeout(() => {
+        window.open(waLink(msg), '_blank');
+        showToast();
+        this.reset();
+        setLoading(btn, false);
+      }, 600);
+    });
+  </script>
+</body>
+</html>
