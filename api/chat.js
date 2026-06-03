@@ -1,6 +1,22 @@
 export default async function handler(req, res) {
+  // FIX Bug 3: CORS headers — wajib ada agar browser tidak memblokir request
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // FIX Bug 3: Handle OPTIONS preflight — browser kirim ini sebelum POST
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Validasi API key ada sebelum request ke Gemini
+  if (!process.env.GEMINI_API_KEY) {
+    console.error('GEMINI_API_KEY tidak ditemukan di environment variables');
+    return res.status(500).json({ error: 'Server configuration error: API key missing' });
   }
 
   const { messages } = req.body;
