@@ -1127,7 +1127,8 @@ const response = await fetch('/api/chat', {
 const data = await response.json();
 
 if(data.content && data.content[0]){
-  const reply = data.content[0].text;
+      hideTyping(); // FIX Bug 1: dipanggil di jalur sukses
+      const reply = data.content[0].text;
       chatHistory.push({role:'assistant', content: reply});
       addBotMsg(reply);
       
@@ -1149,6 +1150,7 @@ if(data.content && data.content[0]){
         }, 600);
       }
     } else {
+      hideTyping(); // FIX Bug 2: dipanggil di jalur else (data kosong / error dari server)
       addBotMsg('Maaf kak, ada gangguan sebentar. Silakan coba lagi atau langsung chat via WhatsApp ya! 😊');
     }
   } catch(err) {
